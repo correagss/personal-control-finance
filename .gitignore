@@ -1,0 +1,14 @@
+# Ambiente Virtual do Python
+.venv/
+venv/
+
+# Arquivos temporários do Python
+__pycache__/
+
+# Arquivos de banco de dados SQLite
+*.db
+*.sqlite3
+
+# Arquivos de sistema operacional (opcional, mas bom ter)
+.DS_Store
+Thumbs.db

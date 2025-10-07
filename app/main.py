@@ -1,13 +1,12 @@
 # =======================================================================
-# 1. IMPORTAÇÕES (TUDO JUNTO AQUI)
+# 1. IMPORTAÇÕES (Sem mudanças aqui)
 # =======================================================================
 import datetime
 from datetime import timedelta
 from typing import List
-
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -17,6 +16,7 @@ from sqlalchemy import (Column, DateTime, Float, Integer, String,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.responses import FileResponse
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, ForeignKey
 
 # =======================================================================
 # 2. CONFIGURAÇÕES GLOBAIS
@@ -25,6 +25,7 @@ from starlette.responses import FileResponse
 SECRET_KEY = "Microsatelite_Em_Orbita"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # --- CONFIGURAÇÃO DE SENHAS ---
 pwd_context = CryptContext(schemes=["argon2", "bcrypt"], deprecated="auto")
@@ -36,7 +37,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # =======================================================================
-# 3. MODELOS DO BANCO DE DADOS (SQLAlchemy)
+# 3. MODELOS DO BANCO DE DADOS (SQLAlchemy) - (Sem mudanças aqui)
 # =======================================================================
 class Transacao(Base):
     __tablename__ = "transacoes"
@@ -45,6 +46,7 @@ class Transacao(Base):
     valor = Column(Float)
     tipo = Column(String)
     data = Column(DateTime, default=datetime.datetime.utcnow)
+    owner_id = Column(Integer, ForeignKey("usuarios.id"))
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -52,11 +54,10 @@ class Usuario(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
-# Cria as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
 
 # =======================================================================
-# 4. SCHEMAS DE DADOS (Pydantic)
+# 4. SCHEMAS DE DADOS (Pydantic) - (Sem mudanças aqui)
 # =======================================================================
 class TransacaoBase(BaseModel):
     descricao: str
@@ -110,13 +111,34 @@ def get_db():
     finally:
         db.close()
 
+### ALTERADO ###
+# A função get_current_user foi movida para cá, para depois de 'get_db' e 'Usuario' serem definidos
+async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    
+    user = db.query(Usuario).filter(Usuario.email == email).first()
+    if user is None:
+        raise credentials_exception
+    return user
+
 # =======================================================================
-# 6. INICIALIZAÇÃO DO APP FASTAPI
+# 6. INICIALIZAÇÃO DO APP FASTAPI - (Sem mudanças aqui)
 # =======================================================================
 app = FastAPI()
 
 # =======================================================================
-# 7. MONTAGEM DO FRONTEND E CORS
+# 7. MONTAGEM DO FRONTEND E CORS - (Sem mudanças aqui)
 # =======================================================================
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
@@ -137,7 +159,7 @@ app.add_middleware(
 # 8. ROTAS DA API
 # =======================================================================
 
-# --- ROTAS DE AUTENTICAÇÃO ---
+# --- ROTAS DE AUTENTICAÇÃO --- (Sem mudanças aqui)
 @app.post("/registrar", response_model=UserSchema, tags=["Autenticação"])
 def registrar_usuario(user: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(Usuario).filter(Usuario.email == user.email).first()
@@ -163,19 +185,64 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
     return {"access_token": access_token, "token_type": "bearer"}
 
 # --- ROTAS DE TRANSAÇÕES ---
+### ALTERADO ###
 @app.post("/transacoes/", response_model=TransacaoSchema, tags=["Transações"])
-def criar_transacao(transacao: TransacaoCreate, db: Session = Depends(get_db)):
-    nova_transacao = Transacao(**transacao.dict())
+def criar_transacao(transacao: TransacaoCreate, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    nova_transacao = Transacao(**transacao.dict(), owner_id=current_user.id)
     db.add(nova_transacao)
     db.commit()
     db.refresh(nova_transacao)
     return nova_transacao
 
+### ALTERADO ###
 @app.get("/transacoes/", response_model=List[TransacaoSchema], tags=["Transações"])
-def ler_transacoes(db: Session = Depends(get_db)):
-    transacoes = db.query(Transacao).all()
+def ler_transacoes(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    transacoes = db.query(Transacao).filter(Transacao.owner_id == current_user.id).all()
     return transacoes
 
-# ... (o resto das suas rotas de transações e saldo continuam aqui)
-# (Eu adicionei 'tags' para organizar melhor seus docs!)
-# ...
+### ALTERADO ###
+@app.get("/transacoes/{transacao_id}", response_model=TransacaoSchema, tags=["Transações"])
+def ler_transacao_por_id(transacao_id: int, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    transacao = db.query(Transacao).filter(Transacao.id == transacao_id, Transacao.owner_id == current_user.id).first()
+    if transacao is None:
+        raise HTTPException(status_code=404, detail="Transação não encontrada")
+    return transacao
+
+### ALTERADO ###
+@app.put("/transacoes/{transacao_id}", response_model=TransacaoSchema, tags=["Transações"])
+def atualizar_transacao(transacao_id: int, transacao: TransacaoCreate, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    db_transacao = db.query(Transacao).filter(Transacao.id == transacao_id, Transacao.owner_id == current_user.id).first()
+    if db_transacao is None:
+        raise HTTPException(status_code=404, detail="Transação não encontrada")
+
+    for key, value in transacao.dict().items():
+        setattr(db_transacao, key, value)
+    
+    db.commit()
+    db.refresh(db_transacao)
+    return db_transacao
+
+### ALTERADO ###
+@app.delete("/transacoes/{transacao_id}", tags=["Transações"])
+def deletar_transacao(transacao_id: int, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    db_transacao = db.query(Transacao).filter(Transacao.id == transacao_id, Transacao.owner_id == current_user.id).first()
+    if db_transacao is None:
+        raise HTTPException(status_code=404, detail="Transação não encontrada")
+    
+    db.delete(db_transacao)
+    db.commit()
+    return {"mensagem": "Transação deletada com sucesso"}
+
+### ALTERADO ###
+@app.get("/saldo/", tags=["Transações"])
+def get_saldo(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    transacoes = db.query(Transacao).filter(Transacao.owner_id == current_user.id).all()
+    total_entradas = sum(t.valor for t in transacoes if t.tipo == 'entrada')
+    total_saidas = sum(t.valor for t in transacoes if t.tipo == 'saida')
+    saldo = total_entradas - total_saidas
+    
+    return {
+        "total_entradas": round(total_entradas, 2),
+        "total_saidas": round(total_saidas, 2),
+        "saldo": round(saldo, 2)
+    }

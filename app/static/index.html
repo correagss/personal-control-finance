@@ -5,46 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Finanças do Chimpanzé</title>
     <style>
-        /* --- CSS COMPLETO E CORRIGIDO --- */
         body { font-family: sans-serif; background-color: #f4f4f4; color: #333; }
         .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         form { display: flex; gap: 10px; margin-bottom: 20px; }
         input, select { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button[type="submit"] { padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
         ul { list-style-type: none; padding: 0; }
         li { background: #eee; padding: 15px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
         .entrada { border-left: 5px solid green; }
         .saida { border-left: 5px solid red; }
-
-        /* Estilo para o botão de deletar e para o contêiner da descrição/data */
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            line-height: 25px; /* Centraliza o "X" verticalmente */
-            text-align: center; /* Centraliza o "X" horizontalmente */
-            padding: 0;
-        }
-        li > div {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .delete-btn { background-color: #dc3545; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-weight: bold; }
+        .edit-btn { background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+        li > div:first-child { display: flex; flex-direction: column; gap: 4px; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>Meu Cofrinho de Bananas 🍌</h1>
-        
-        <h2>Adicionar Nova Transação</h2>
         <form id="form-transacao">
-            <input type="text" id="descricao" placeholder="Descrição (ex: Compra de bananas)" required>
+            <input type="text" id="descricao" placeholder="Descrição" required>
             <input type="number" id="valor" step="0.01" placeholder="Valor" required>
             <select id="tipo" required>
                 <option value="entrada">Entrada</option>
@@ -52,95 +31,107 @@
             </select>
             <button type="submit">Adicionar</button>
         </form>
-
         <h2>Minhas Transações</h2>
-        <ul id="lista-transacoes">
-            <!-- As transações aparecerão aqui via JavaScript -->
-        </ul>
-
+        <ul id="lista-transacoes"></ul>
         <h2>Saldo</h2>
         <h3 id="saldo-total">R$ 0.00</h3>
     </div>
 
-    <!-- A MÁGICA ACONTECE AQUI -->
     <script>
-        // --- JAVASCRIPT COMPLETO E CORRIGIDO ---
-
-        const API_URL = 'http://127.0.0.1:8000';
-
+        const API_URL = '';
         const form = document.getElementById('form-transacao');
         const listaTransacoes = document.getElementById('lista-transacoes');
         const saldoTotalEl = document.getElementById('saldo-total');
+        let editandoId = null;
 
-        // --- Função para buscar todas as transações e o saldo da API ---
         async function carregarDados() {
             try {
-                const resTransacoes = await fetch(`${API_URL}/transacoes/`);
+                const [resTransacoes, resSaldo] = await Promise.all([
+                    fetch(`${API_URL}/transacoes/`),
+                    fetch(`${API_URL}/saldo/`)
+                ]);
                 const transacoes = await resTransacoes.json();
-                
-                const resSaldo = await fetch(`${API_URL}/saldo/`);
                 const saldoData = await resSaldo.json();
-
-                listaTransacoes.innerHTML = ''; 
-
+                listaTransacoes.innerHTML = '';
                 transacoes.forEach(transacao => {
                     const li = document.createElement('li');
                     li.className = transacao.tipo;
-                    
                     li.innerHTML = `
                         <div>
                             <span>${transacao.descricao}</span>
-                            <small>${new Date(transacao.data).toLocaleDateString('pt-BR')}</small> 
+                            <small>${new Date(transacao.data).toLocaleDateString('pt-BR')}</small>
                         </div>
-                        <span>R$ ${transacao.valor.toFixed(2)}</span>
-                        <button class="delete-btn" onclick="deletarTransacao(${transacao.id})">X</button> 
-                    `;
+                        <div>
+                            <span>R$ ${transacao.valor.toFixed(2)}</span>
+                            <button class="edit-btn" onclick="iniciarEdicao(${transacao.id})">Editar</button>
+                            <button class="delete-btn" onclick="deletarTransacao(${transacao.id})">X</button>
+                        </div>`;
                     listaTransacoes.appendChild(li);
                 });
-
                 saldoTotalEl.textContent = `R$ ${saldoData.saldo.toFixed(2)}`;
             } catch (error) {
-                console.error('Falha ao carregar os dados:', error);
-                alert('Não foi possível conectar ao servidor. Verifique se a API está rodando.');
+                console.error('Falha ao carregar dados:', error);
+                alert('Não foi possível conectar ao servidor.');
             }
         }
+        
+        async function iniciarEdicao(id) {
+            const res = await fetch(`${API_URL}/transacoes/${id}`);
+            const transacao = await res.json();
+            document.getElementById('descricao').value = transacao.descricao;
+            document.getElementById('valor').value = transacao.valor;
+            document.getElementById('tipo').value = transacao.tipo;
+            editandoId = id;
+            const btnSubmit = document.querySelector('#form-transacao button[type="submit"]');
+            btnSubmit.textContent = 'Salvar';
+            btnSubmit.style.backgroundColor = '#007bff';
+        }
 
-        // --- Função para adicionar uma nova transação ---
-        async function adicionarTransacao(event) {
-            event.preventDefault(); 
-
+        async function adicionarTransacao() {
             const descricao = document.getElementById('descricao').value;
             const valor = parseFloat(document.getElementById('valor').value);
             const tipo = document.getElementById('tipo').value;
-
-            // Preenchemos a função que estava vazia!
             await fetch(`${API_URL}/transacoes/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ descricao, valor, tipo }),
             });
-
-            form.reset();
-            carregarDados();
         }
 
-        // --- Função para deletar uma transação ---
-        async function deletarTransacao(id) {
-            if (!confirm('Tem certeza que quer deletar esta transação?')) {
-                return;
-            }
-
+        async function salvarEdicao(id) {
+            const descricao = document.getElementById('descricao').value;
+            const valor = parseFloat(document.getElementById('valor').value);
+            const tipo = document.getElementById('tipo').value;
             await fetch(`${API_URL}/transacoes/${id}`, {
-                method: 'DELETE',
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ descricao, valor, tipo }),
             });
-
-            carregarDados();
+            editandoId = null;
+            const btnSubmit = document.querySelector('#form-transacao button[type="submit"]');
+            btnSubmit.textContent = 'Adicionar';
+            btnSubmit.style.backgroundColor = '#28a745';
+        }
+        
+        async function manipularSubmit(event) {
+            event.preventDefault();
+            if (editandoId !== null) {
+                await salvarEdicao(editandoId);
+            } else {
+                await adicionarTransacao();
+            }
+            form.reset();
+            await carregarDados();
         }
 
-        // --- Eventos ---
+        async function deletarTransacao(id) {
+            if (!confirm('Tem certeza que quer deletar esta transação?')) return;
+            await fetch(`${API_URL}/transacoes/${id}`, { method: 'DELETE' });
+            await carregarDados();
+        }
+        
         document.addEventListener('DOMContentLoaded', carregarDados);
-        form.addEventListener('submit', adicionarTransacao);
-
+        form.addEventListener('submit', manipularSubmit);
     </script>
 </body>
 </html>

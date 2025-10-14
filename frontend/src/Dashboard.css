@@ -1,0 +1,58 @@
+/* frontend/src/Dashboard.css */
+
+.dashboard-container {
+  max-width: 800px;
+  margin: 40px auto; /* Centraliza e dá um espaço no topo */
+  padding: 20px;
+  font-family: sans-serif;
+  background-color: #f0f2f5;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dddfe2;
+}
+
+.dashboard-header h1 {
+  color: #1c1e21;
+}
+
+.logout-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #f0f2f5;
+  color: #606770;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #e4e6eb;
+}
+
+.saldo-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.saldo-container h2 {
+  margin-top: 0;
+  color: #606770;
+}
+
+.saldo-valor {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #1c1e21;
+}

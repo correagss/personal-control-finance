@@ -1,0 +1,68 @@
+/* frontend/src/Login.css */
+
+/* O contêiner principal da nossa tela de login */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Ocupa a tela inteira */
+  background-color: #f0f2f5;
+  font-family: sans-serif;
+}
+
+/* O "card" branco onde o formulário fica */
+.login-card {
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px; /* Garante que não fique gigante em telas grandes */
+  text-align: center;
+}
+
+.login-card h2 {
+  margin-bottom: 24px;
+  color: #1c1e21;
+}
+
+/* O nosso formulário */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Espaço entre os inputs e o botão */
+}
+
+/* Estilo para os campos de e-mail e senha */
+.login-form input {
+  padding: 14px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+/* Estilo para o botão de "Entrar" */
+.login-form button {
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  background-color: #1877f2; /* Azul do Facebook :) */
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Efeito suave ao passar o mouse */
+}
+
+/* Efeito ao passar o mouse por cima do botão */
+.login-form button:hover {
+  background-color: #166fe5;
+}
+
+/* Estilo para a mensagem de erro */
+.login-error {
+  color: #fa383e;
+  margin-top: 16px;
+  font-size: 14px;
+}

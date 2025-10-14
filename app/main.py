@@ -1,22 +1,21 @@
 # =======================================================================
-# 1. IMPORTAÇÕES (Sem mudanças aqui)
+# 1. IMPORTAÇÕES
 # =======================================================================
+import re
 import datetime
 from datetime import timedelta
 from typing import List
+
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastapi.staticfiles import StaticFiles
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from sqlalchemy import (Column, DateTime, Float, Integer, String,
+from sqlalchemy import (Column, DateTime, Float, ForeignKey, Integer, String,
                         create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
-from starlette.responses import FileResponse
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, ForeignKey
 
 # =======================================================================
 # 2. CONFIGURAÇÕES GLOBAIS
@@ -37,7 +36,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # =======================================================================
-# 3. MODELOS DO BANCO DE DADOS (SQLAlchemy) - (Sem mudanças aqui)
+# 3. MODELOS DO BANCO DE DADOS (SQLAlchemy)
 # =======================================================================
 class Transacao(Base):
     __tablename__ = "transacoes"
@@ -57,7 +56,7 @@ class Usuario(Base):
 Base.metadata.create_all(bind=engine)
 
 # =======================================================================
-# 4. SCHEMAS DE DADOS (Pydantic) - (Sem mudanças aqui)
+# 4. SCHEMAS DE DADOS (Pydantic)
 # =======================================================================
 class TransacaoBase(BaseModel):
     descricao: str
@@ -91,6 +90,15 @@ class Token(BaseModel):
 # =======================================================================
 # 5. FUNÇÕES DE UTILIDADE E DEPENDÊNCIAS
 # =======================================================================
+def validate_password(password: str):
+    if len(password) < 6:
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[-!@#$%^&*(),.?\":{}|<>]", password):
+        return False
+    return True
+
 def hash_password(password: str):
     return pwd_context.hash(password)
 
@@ -111,8 +119,6 @@ def get_db():
     finally:
         db.close()
 
-### ALTERADO ###
-# A função get_current_user foi movida para cá, para depois de 'get_db' e 'Usuario' serem definidos
 async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -133,20 +139,20 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(o
     return user
 
 # =======================================================================
-# 6. INICIALIZAÇÃO DO APP FASTAPI - (Sem mudanças aqui)
+# 6. INICIALIZAÇÃO DO APP FASTAPI
 # =======================================================================
 app = FastAPI()
 
 # =======================================================================
-# 7. MONTAGEM DO FRONTEND E CORS - (Sem mudanças aqui)
+# 7. CONFIGURAÇÃO DO CORS
 # =======================================================================
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "http://localhost:5173",
+]
 
-@app.get("/", include_in_schema=False)
-async def root():
-    return FileResponse('app/static/index.html')
-
-origins = ["http://localhost", "http://localhost:8080", "http://127.0.0.1:8080"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -159,14 +165,23 @@ app.add_middleware(
 # 8. ROTAS DA API
 # =======================================================================
 
-# --- ROTAS DE AUTENTICAÇÃO --- (Sem mudanças aqui)
+# --- ROTAS DE AUTENTICAÇÃO ---
 @app.post("/registrar", response_model=UserSchema, tags=["Autenticação"])
 def registrar_usuario(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(Usuario).filter(Usuario.email == user.email).first()
+    if not validate_password(user.password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A senha deve ter no mínimo 6 caracteres, uma letra maiúscula e um caractere especial(#$%-@&*)."
+        )
+    
+    normalized_email = user.email.lower()
+    db_user = db.query(Usuario).filter(Usuario.email == normalized_email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="E-mail já registrado")
+    
     hashed_password = hash_password(user.password)
-    db_user = Usuario(email=user.email, hashed_password=hashed_password)
+    db_user = Usuario(email=normalized_email, hashed_password=hashed_password)
+    
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -174,18 +189,20 @@ def registrar_usuario(user: UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/login", response_model=Token, tags=["Autenticação"])
 def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
-    user = db.query(Usuario).filter(Usuario.email == form_data.username).first()
+    normalized_email = form_data.username.lower()
+    user = db.query(Usuario).filter(Usuario.email == normalized_email).first()
+    
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=401,
             detail="E-mail ou senha incorretos",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
 # --- ROTAS DE TRANSAÇÕES ---
-### ALTERADO ###
 @app.post("/transacoes/", response_model=TransacaoSchema, tags=["Transações"])
 def criar_transacao(transacao: TransacaoCreate, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     nova_transacao = Transacao(**transacao.dict(), owner_id=current_user.id)
@@ -194,13 +211,11 @@ def criar_transacao(transacao: TransacaoCreate, db: Session = Depends(get_db), c
     db.refresh(nova_transacao)
     return nova_transacao
 
-### ALTERADO ###
 @app.get("/transacoes/", response_model=List[TransacaoSchema], tags=["Transações"])
 def ler_transacoes(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     transacoes = db.query(Transacao).filter(Transacao.owner_id == current_user.id).all()
     return transacoes
 
-### ALTERADO ###
 @app.get("/transacoes/{transacao_id}", response_model=TransacaoSchema, tags=["Transações"])
 def ler_transacao_por_id(transacao_id: int, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     transacao = db.query(Transacao).filter(Transacao.id == transacao_id, Transacao.owner_id == current_user.id).first()
@@ -208,7 +223,6 @@ def ler_transacao_por_id(transacao_id: int, db: Session = Depends(get_db), curre
         raise HTTPException(status_code=404, detail="Transação não encontrada")
     return transacao
 
-### ALTERADO ###
 @app.put("/transacoes/{transacao_id}", response_model=TransacaoSchema, tags=["Transações"])
 def atualizar_transacao(transacao_id: int, transacao: TransacaoCreate, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     db_transacao = db.query(Transacao).filter(Transacao.id == transacao_id, Transacao.owner_id == current_user.id).first()
@@ -222,7 +236,6 @@ def atualizar_transacao(transacao_id: int, transacao: TransacaoCreate, db: Sessi
     db.refresh(db_transacao)
     return db_transacao
 
-### ALTERADO ###
 @app.delete("/transacoes/{transacao_id}", tags=["Transações"])
 def deletar_transacao(transacao_id: int, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     db_transacao = db.query(Transacao).filter(Transacao.id == transacao_id, Transacao.owner_id == current_user.id).first()
@@ -233,7 +246,6 @@ def deletar_transacao(transacao_id: int, db: Session = Depends(get_db), current_
     db.commit()
     return {"mensagem": "Transação deletada com sucesso"}
 
-### ALTERADO ###
 @app.get("/saldo/", tags=["Transações"])
 def get_saldo(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     transacoes = db.query(Transacao).filter(Transacao.owner_id == current_user.id).all()

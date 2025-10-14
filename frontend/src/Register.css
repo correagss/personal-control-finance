@@ -1,0 +1,82 @@
+/* frontend/src/Register.css */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+  font-family: sans-serif;
+}
+
+.register-card {
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.register-card h2 {
+  margin-bottom: 24px;
+  color: #1c1e21;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.register-form input {
+  padding: 14px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.register-form button {
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  background-color: #42b72a; /* Um verde para diferenciar do login */
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.register-form button:hover {
+  background-color: #36a420;
+}
+
+.form-message {
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.form-message.success {
+  color: #42b72a;
+}
+
+.form-message.error {
+  color: #fa383e;
+}
+
+.login-link {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}

@@ -29,8 +29,8 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
     setError('');
 
     const url = isEditing
-      ? `http://127.0.0.1:8000/transacoes/${transacaoParaEditar.id}` 
-      : 'http://127.0.0.1:8000/transacoes/'; 
+      ? `import.meta.env.VITE_API_URL/transacoes/${transacaoParaEditar.id}` 
+      : 'import.meta.env.VITE_API_URL/transacoes/'; 
 
     const method = isEditing ? 'PUT' : 'POST';
 

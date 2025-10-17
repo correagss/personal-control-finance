@@ -15,8 +15,8 @@ function Dashboard({ token, onLogout }) {
     
     try {
       const [resSaldo, resTransacoes] = await Promise.all([
-        fetch('http://127.0.0.1:8000/saldo', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://127.0.0.1:8000/transacoes/', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('import.meta.env.VITE_API_URL/saldo', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('import.meta.env.VITE_API_URL/transacoes/', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (!resSaldo.ok || !resTransacoes.ok) { throw new Error('Failed to fetch data.'); }
       const dataSaldo = await resSaldo.json();
@@ -37,7 +37,7 @@ function Dashboard({ token, onLogout }) {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this transaction?')) return;
     try {
-      await fetch(`http://127.0.0.1:8000/transacoes/${id}`, {
+      await fetch(`import.meta.env.VITE_API_URL/transacoes/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

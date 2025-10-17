@@ -1,8 +1,11 @@
-// src/Register.jsx
+
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; 
 import './Register.css';
 
-function Register({ onSwitchToLogin }) { // Recebe a função para voltar ao login
+function Register() { 
+  const navigate = useNavigate(); 
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -23,10 +26,15 @@ function Register({ onSwitchToLogin }) { // Recebe a função para voltar ao log
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || 'Falha ao registrar.');
+        throw new Error(data.detail || 'Failed to register.');
       }
       
-      setMessage('Usuário registrado com sucesso! Você já pode fazer o login.');
+      setMessage('User registered successfully! Redirecting to login...');
+      
+      
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
 
     } catch (err) {
       setMessage(err.message);
@@ -37,7 +45,7 @@ function Register({ onSwitchToLogin }) { // Recebe a função para voltar ao log
   return (
     <div className="register-container">
       <div className="register-card">
-        <h2>Criar Nova Conta</h2>
+        <h2>Create New Account</h2>
         <form onSubmit={handleSubmit} className="register-form">
           <input
             type="email"
@@ -48,12 +56,12 @@ function Register({ onSwitchToLogin }) { // Recebe a função para voltar ao log
           />
           <input
             type="password"
-            placeholder="Senha"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit">Registrar</button>
+          <button type="submit">Register</button>
         </form>
         {message && (
           <p className={`form-message ${isError ? 'error' : 'success'}`}>
@@ -61,7 +69,7 @@ function Register({ onSwitchToLogin }) { // Recebe a função para voltar ao log
           </p>
         )}
         <p className="login-link">
-          Já tem uma conta? <a href="#" onClick={onSwitchToLogin}>Faça o login</a>
+          Already have an account? <Link to="/login">Log in</Link>
         </p>
       </div>
     </div>

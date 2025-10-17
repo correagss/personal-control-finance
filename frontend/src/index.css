@@ -1,0 +1,13 @@
+
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #e0e0e0;
+  
+  background-color: #121212; 
+  background-image: url('/darkness.png');
+  
+  background-repeat: repeat; 
+  background-attachment: fixed; 
+}

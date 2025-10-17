@@ -1,64 +1,112 @@
-// src/Dashboard.jsx
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import './Dashboard.css';
+import TransactionForm from './TransactionForm';
 
 function Dashboard({ token, onLogout }) {
-  // Memória para guardar o saldo
   const [saldo, setSaldo] = useState(null);
+  const [transacoes, setTransacoes] = useState([]);
   const [error, setError] = useState('');
+  
+  
+  const [transacaoEmEdicao, setTransacaoEmEdicao] = useState(null);
 
-  // useEffect: O "Macaco Trabalhador" do React.
-  // Ele roda o código aqui dentro AUTOMATICAMENTE quando o componente aparece na tela.
+  const buscarDados = useCallback(async () => {
+    
+    try {
+      const [resSaldo, resTransacoes] = await Promise.all([
+        fetch('http://127.0.0.1:8000/saldo/', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://127.0.0.1:8000/transacoes/', { headers: { 'Authorization': `Bearer ${token}` } })
+      ]);
+      if (!resSaldo.ok || !resTransacoes.ok) { throw new Error('Failed to fetch data.'); }
+      const dataSaldo = await resSaldo.json();
+      const dataTransacoes = await resTransacoes.json();
+      setSaldo(dataSaldo);
+      setTransacoes(dataTransacoes);
+    } catch (err) {
+      setError(err.message);
+      if (err.response?.status === 401) onLogout();
+    }
+  }, [token, onLogout]);
+
   useEffect(() => {
-    const buscarDados = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/saldo/', {
-          method: 'GET',
-          headers: {
-            // A parte mais importante: enviando nosso "passe secreto"!
-            'Authorization': `Bearer ${token}`
-          }
-        });
+    if (token) buscarDados();
+  }, [token, buscarDados]);
 
-        if (!response.ok) {
-          throw new Error('Falha ao buscar dados. Faça login novamente.');
-        }
+ 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this transaction?')) return;
+    try {
+      await fetch(`http://127.0.0.1:8000/transacoes/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      buscarDados();
+    } catch (err) {
+      setError('Failed to delete transaction.');
+    }
+  };
 
-        const data = await response.json();
-        setSaldo(data); // Guarda os dados do saldo na memória
-
-      } catch (err) {
-        setError(err.message);
-        if (err.response && err.response.status === 401) {
-          onLogout(); // Se o token for inválido, desloga o usuário
-        }
-      }
-    };
-
-    buscarDados();
-  }, [token, onLogout]); // A lista de dependências. Roda de novo se o token mudar.
+  
+  const handleEdit = (transacao) => {
+    setTransacaoEmEdicao(transacao); 
+    window.scrollTo(0, 0); 
+  };
+  
+  
+  const handleUpdateDone = () => {
+    setTransacaoEmEdicao(null); 
+    buscarDados(); 
+  };
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Meu Cofrinho de Bananas 🍌</h1>
-        <button onClick={onLogout} className="logout-button">
-          Sair
-        </button>
+        <h1>PERSONAL FINANCE CONTROL📊</h1>
+        <button onClick={onLogout} className="logout-button">Exit</button>
       </header>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {saldo ? ( // Se 'saldo' NÃO for nulo, mostra o card
+      {saldo && (
         <div className="saldo-container">
-          <h2>Saldo Atual</h2>
+          <h2>Current Balance</h2>
           <p className="saldo-valor">R$ {saldo.saldo.toFixed(2)}</p>
         </div>
-      ) : ( // Se 'saldo' for nulo (carregando), mostra uma mensagem
-        <p>Carregando saldo...</p>
       )}
 
-      {/* Aqui virá a lista de transações e o formulário */}
+      
+      <TransactionForm
+        token={token}
+        onTransactionAdded={buscarDados}
+        transacaoParaEditar={transacaoEmEdicao}
+        onUpdateDone={handleUpdateDone}
+      />
+
+      <div className="transacoes-container">
+        <h2>My Transactions</h2>
+        <ul className="transacoes-lista">
+          {transacoes.length > 0 ? (
+            transacoes.map(transacao => (
+              <li key={transacao.id} className={`transacao-item ${transacao.tipo}`}>
+                <div className="transacao-info">
+                  <span>{transacao.descricao}</span>
+                  <small>{new Date(transacao.data).toLocaleDateString('pt-BR')}</small>
+                </div>
+               
+                <div className="transacao-acoes">
+                  <span className="valor">R$ {transacao.valor.toFixed(2)}</span>
+                  <button className="edit-btn" onClick={() => handleEdit(transacao)}>Edit</button>
+                  <button className="delete-btn" onClick={() => handleDelete(transacao.id)}>X</button>
+                </div>
+              </li>
+            ))
+          ) : (
+            <p>No transactions found.</p>
+          )}
+        </ul>
+      </div>
     </div>
   );
 }

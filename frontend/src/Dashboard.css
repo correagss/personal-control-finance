@@ -1,58 +1,44 @@
-/* frontend/src/Dashboard.css */
 
 .dashboard-container {
   max-width: 800px;
-  margin: 40px auto; /* Centraliza e dá um espaço no topo */
+  margin: 40px auto;
   padding: 20px;
   font-family: sans-serif;
-  background-color: #f0f2f5;
 }
-
 .dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #dddfe2;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #333;
 }
-
 .dashboard-header h1 {
-  color: #1c1e21;
+  color: #00aaff; /* AZUL */
 }
-
 .logout-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  background-color: #f0f2f5;
-  color: #606770;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  padding: 10px 20px; border: none; border-radius: 6px; background-color: #252525;
+  color: #e0e0e0; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.3s;
 }
-
-.logout-button:hover {
-  background-color: #e4e6eb;
-}
-
+.logout-button:hover { background-color: #333; }
 .saldo-container {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 20px;
-  text-align: center;
+  background-color: #1e1e1e; border: 1px solid #2d2d2d;
+  padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  margin-bottom: 20px; text-align: center;
 }
-
-.saldo-container h2 {
-  margin-top: 0;
-  color: #606770;
+.saldo-container h2 { margin-top: 0; color: #a0a0a0; }
+.saldo-valor { font-size: 2.5em; font-weight: bold; color: #00aaff; } /* AZUL */
+.transacoes-container { margin-top: 30px; }
+.transacoes-container h2 { color: #a0a0a0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+.transacoes-lista { list-style-type: none; padding: 0; margin: 0; }
+.transacao-item {
+  background-color: #252525; padding: 15px 20px; border-radius: 8px; margin-bottom: 10px;
+  display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #444;
 }
-
-.saldo-valor {
-  font-size: 2.5em;
-  font-weight: bold;
-  color: #1c1e21;
+.transacao-item.entrada { border-left-color: #00c853; }
+.transacao-item.saida { border-left-color: #ff4d4d; }
+.transacao-info span { font-size: 16px; font-weight: 500; }
+.transacao-info small { font-size: 12px; color: #a0a0a0; }
+.transacao-acoes { display: flex; align-items: center; gap: 10px; }
+.transacao-acoes .valor { font-size: 18px; font-weight: bold; }
+.edit-btn, .delete-btn {
+  border: none; border-radius: 4px; cursor: pointer; padding: 5px 10px; color: #121212; font-weight: bold;
 }
+.edit-btn { background-color: #00aaff; }
+.delete-btn { background-color: #ff4d4d; }

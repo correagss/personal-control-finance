@@ -1,15 +1,14 @@
-// src/Login.jsx
+
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; 
 import './Login.css';
 
-// Adicionamos onSwitchToRegister como uma "ponte"
-function Login({ onLogin, onSwitchToRegister }) {
+function Login({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (event) => {
-    // ... a lógica do handleSubmit continua EXATAMENTE a mesma ...
     event.preventDefault();
     setError('');
     try {
@@ -20,7 +19,7 @@ function Login({ onLogin, onSwitchToRegister }) {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'E-mail ou senha incorretos');
+        throw new Error(errorData.detail || 'Incorrect email or password.');
       }
       const data = await response.json();
       onLogin(data.access_token);
@@ -32,7 +31,7 @@ function Login({ onLogin, onSwitchToRegister }) {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h2>Meu Cofrinho de Bananas 🍌</h2>
+        <h2>PERSONAL FINANCE CONTROL 📊</h2>
         <form onSubmit={handleSubmit} className="login-form">
           <input
             type="email"
@@ -43,17 +42,22 @@ function Login({ onLogin, onSwitchToRegister }) {
           />
           <input
             type="password"
-            placeholder="Senha"
+            placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
           />
-          <button type="submit">Entrar</button>
+          <button type="submit">Enter</button>
         </form>
         {error && <p className="login-error">{error}</p>}
-        {/* ADICIONAMOS ESTE LINK ABAIXO */}
+        
+        
         <p className="register-link">
-          Não tem uma conta? <a href="#" onClick={onSwitchToRegister}>Registre-se</a>
+          Don't have an account? <Link to="/register">Register</Link>
+        </p>
+       
+        <p className="privacy-link" style={{ marginTop: '12px', fontSize: '14px' }}>
+          <Link to="/politica-de-privacidade">Privacy Politicy</Link>
         </p>
       </div>
     </div>

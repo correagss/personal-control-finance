@@ -1,13 +1,13 @@
-// src/App.jsx
+// src/App.jsx (CORRIGIDO)
 import React, { useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login.jsx';
-import Register from './Register.jsx'; // Importa o componente de Registro
+import Register from './Register.jsx';
 import Dashboard from './Dashboard.jsx';
+import PrivacyPolicy from './PrivacyPolicy.jsx';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('authToken'));
-  // Nova memória para saber qual tela mostrar: 'login' ou 'register'
-  const [currentView, setCurrentView] = useState('login'); 
 
   const handleLogin = (newToken) => {
     localStorage.setItem('authToken', newToken);
@@ -17,22 +17,29 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     setToken(null);
-    setCurrentView('login'); // Ao deslogar, volta para a tela de login
   };
 
-  // Se o usuário NÃO está logado...
-  if (!token) {
-    if (currentView === 'login') {
-      // ...e a visão atual é 'login', mostra o componente de Login
-      return <Login onLogin={handleLogin} onSwitchToRegister={() => setCurrentView('register')} />;
-    } else {
-      // ...e a visão atual é 'register', mostra o componente de Registro
-      return <Register onSwitchToLogin={() => setCurrentView('login')} />;
-    }
-  }
-
-  // Se o usuário ESTÁ logado, mostra o Dashboard
-  return <Dashboard token={token} onLogout={handleLogout} />;
+  return (
+    <Routes>
+      {!token ? (
+        
+        <>
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
+          <Route path="/" element={<Navigate to="/login" />} /> {}
+          <Route path="*" element={<Navigate to="/login" />} /> {}
+        </>
+      ) : (
+        
+        <>
+          <Route path="/dashboard" element={<Dashboard token={token} onLogout={handleLogout} />} />
+          <Route path="/" element={<Navigate to="/dashboard" />} /> {}
+          <Route path="*" element={<Navigate to="/dashboard" />} /> {}
+        </>
+      )}
+    </Routes>
+  );
 }
 
 export default App;

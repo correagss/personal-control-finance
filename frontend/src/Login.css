@@ -1,68 +1,80 @@
 /* frontend/src/Login.css */
 
-/* O contêiner principal da nossa tela de login */
 .login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh; /* Ocupa a tela inteira */
-  background-color: #f0f2f5;
+  height: 100vh;
   font-family: sans-serif;
 }
 
-/* O "card" branco onde o formulário fica */
 .login-card {
-  background-color: white;
+  background-color: #1e1e1e; /* Card com um cinza um pouco mais claro */
   padding: 40px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   width: 100%;
-  max-width: 400px; /* Garante que não fique gigante em telas grandes */
+  max-width: 400px;
   text-align: center;
+  border: 1px solid #2d2d2d; /* Borda sutil */
 }
 
 .login-card h2 {
   margin-bottom: 24px;
-  color: #1c1e21;
+  color: #00aaff; /* TÍTULO COM A FONTE AZUL! */
+  font-weight: bold;
 }
 
-/* O nosso formulário */
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Espaço entre os inputs e o botão */
+  gap: 16px;
 }
 
-/* Estilo para os campos de e-mail e senha */
 .login-form input {
   padding: 14px;
-  border: 1px solid #dddfe2;
+  border: 1px solid #333;
+  background-color: #252525;
+  color: #e0e0e0; 
   border-radius: 6px;
   font-size: 16px;
 }
 
-/* Estilo para o botão de "Entrar" */
 .login-form button {
   padding: 14px;
   border: none;
   border-radius: 6px;
-  background-color: #1877f2; /* Azul do Facebook :) */
-  color: white;
+  background-color: #00aaff; 
+  color: #121212; 
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s; /* Efeito suave ao passar o mouse */
+  transition: background-color 0.3s;
 }
 
-/* Efeito ao passar o mouse por cima do botão */
 .login-form button:hover {
-  background-color: #166fe5;
+  background-color: #0088cc; 
 }
 
-/* Estilo para a mensagem de erro */
 .login-error {
-  color: #fa383e;
+  color: #ff4d4d; 
   margin-top: 16px;
   font-size: 14px;
+}
+
+.register-link, .privacy-link {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #a0a0a0; 
+}
+
+.register-link a, .privacy-link a {
+  color: #00aaff; 
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.register-link a:hover, .privacy-link a:hover {
+  text-decoration: underline;
 }

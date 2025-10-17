@@ -15,7 +15,7 @@ function Dashboard({ token, onLogout }) {
     
     try {
       const [resSaldo, resTransacoes] = await Promise.all([
-        fetch('http://127.0.0.1:8000/saldo/', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://127.0.0.1:8000/saldo', { headers: { 'Authorization': `Bearer ${token}` } }),
         fetch('http://127.0.0.1:8000/transacoes/', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (!resSaldo.ok || !resTransacoes.ok) { throw new Error('Failed to fetch data.'); }

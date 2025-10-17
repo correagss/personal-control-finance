@@ -1,7 +1,8 @@
-
+// src/Login.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 import './Login.css';
+import PasswordInput from './PasswordInput'; 
 
 function Login({ onLogin }) {
   const [email, setEmail] = useState('');
@@ -40,17 +41,18 @@ function Login({ onLogin }) {
             onChange={e => setEmail(e.target.value)}
             required
           />
-          <input
-            type="password"
+          
+          
+          <PasswordInput
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            required
+            required={true}
           />
+          
           <button type="submit">Enter</button>
         </form>
         {error && <p className="login-error">{error}</p>}
-        
         
         <p className="register-link">
           Don't have an account? <Link to="/register">Register</Link>

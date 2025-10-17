@@ -1,7 +1,8 @@
-
+// src/Register.jsx
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
+import PasswordInput from './PasswordInput'; 
 
 function Register() { 
   const navigate = useNavigate(); 
@@ -31,7 +32,6 @@ function Register() {
       
       setMessage('User registered successfully! Redirecting to login...');
       
-      
       setTimeout(() => {
         navigate('/login');
       }, 2000);
@@ -54,13 +54,14 @@ function Register() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <input
-            type="password"
+
+          <PasswordInput
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            required={true}
           />
+
           <button type="submit">Register</button>
         </form>
         {message && (

@@ -1,18 +1,15 @@
 
+// src/TransactionForm.jsx
 import React, { useState, useEffect } from 'react';
 import './TransactionForm.css';
-
 
 function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpdateDone }) {
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
   const [tipo, setTipo] = useState('saida');
   const [error, setError] = useState('');
-  
-
   const [isEditing, setIsEditing] = useState(false);
 
-  
   useEffect(() => {
     if (transacaoParaEditar) {
       setDescricao(transacaoParaEditar.descricao);
@@ -28,9 +25,10 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
     event.preventDefault();
     setError('');
 
+    // --- CORRIGIDO ---
     const url = isEditing
-      ? `import.meta.env.VITE_API_URL/transacoes/${transacaoParaEditar.id}` 
-      : 'import.meta.env.VITE_API_URL/transacoes/'; 
+      ? `${import.meta.env.VITE_API_URL}/api/transacoes/${transacaoParaEditar.id}` 
+      : `${import.meta.env.VITE_API_URL}/api/transacoes/`; 
 
     const method = isEditing ? 'PUT' : 'POST';
 
@@ -47,7 +45,6 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
       if (!response.ok) {
         throw new Error(`Falha ao ${isEditing ? 'atualizar' : 'adicionar'} transação.`);
       }
-      
       
       setDescricao('');
       setValor('');
@@ -66,6 +63,7 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
   };
 
   return (
+    // ... JSX continua igual
     <div className="form-container">
       <h2>{isEditing ? 'Edit Transaction' : 'Add New Transaction'}</h2>
       <form onSubmit={handleSubmit} className="transaction-form">

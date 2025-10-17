@@ -13,7 +13,8 @@ function Login({ onLogin }) {
     event.preventDefault();
     setError('');
     try {
-      const response = await fetch('import.meta.env.VITE_API_URL/login', {
+      // --- CORRIGIDO ---
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ 'username': email, 'password': password })
@@ -30,6 +31,7 @@ function Login({ onLogin }) {
   };
 
   return (
+    // ... JSX continua igual
     <div className="login-container">
       <div className="login-card">
         <h2>PERSONAL FINANCE CONTROL 📊</h2>
@@ -41,23 +43,18 @@ function Login({ onLogin }) {
             onChange={e => setEmail(e.target.value)}
             required
           />
-          
-          
           <PasswordInput
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required={true}
           />
-          
           <button type="submit">Enter</button>
         </form>
         {error && <p className="login-error">{error}</p>}
-        
         <p className="register-link">
           Don't have an account? <Link to="/register">Register</Link>
         </p>
-       
         <p className="privacy-link" style={{ marginTop: '12px', fontSize: '14px' }}>
           <Link to="/politica-de-privacidade">Privacy Politicy</Link>
         </p>

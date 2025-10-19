@@ -13,8 +13,8 @@ function Login({ onLogin }) {
     event.preventDefault();
     setError('');
     try {
-      // --- CORRIGIDO ---
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
+      
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ 'username': email, 'password': password })
@@ -31,7 +31,7 @@ function Login({ onLogin }) {
   };
 
   return (
-    // ... JSX continua igual
+    
     <div className="login-container">
       <div className="login-card">
         <h2>PERSONAL FINANCE CONTROL 📊</h2>

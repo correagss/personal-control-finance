@@ -12,9 +12,9 @@ function Dashboard({ token, onLogout }) {
   const buscarDados = useCallback(async () => {
     try {
       const [resSaldo, resTransacoes] = await Promise.all([
-        // --- CORRIGIDO ---
-        fetch(`${import.meta.env.VITE_API_URL}/api/saldo`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${import.meta.env.VITE_API_URL}/api/transacoes/`, { headers: { 'Authorization': `Bearer ${token}` } })
+        
+        fetch('/api/saldo', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('/api/transacoes/', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (!resSaldo.ok || !resTransacoes.ok) { throw new Error('Failed to fetch data.'); }
       const dataSaldo = await resSaldo.json();
@@ -34,8 +34,8 @@ function Dashboard({ token, onLogout }) {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this transaction?')) return;
     try {
-      // --- CORRIGIDO ---
-      await fetch(`${import.meta.env.VITE_API_URL}/api/transacoes/${id}`, {
+      
+      await fetch(`/api/transacoes/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -56,28 +56,25 @@ function Dashboard({ token, onLogout }) {
   };
 
   return (
+    
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>PERSONAL FINANCE CONTROL📊</h1>
         <button onClick={onLogout} className="logout-button">Exit</button>
       </header>
-
       {error && <p style={{ color: 'red' }}>{error}</p>}
-
       {saldo && (
         <div className="saldo-container">
           <h2>Current Balance</h2>
           <p className="saldo-valor">R$ {saldo.saldo.toFixed(2)}</p>
         </div>
       )}
-
       <TransactionForm
         token={token}
         onTransactionAdded={buscarDados}
         transacaoParaEditar={transacaoEmEdicao}
         onUpdateDone={handleUpdateDone}
       />
-
       <div className="transacoes-container">
         <h2>My Transactions</h2>
         <ul className="transacoes-lista">

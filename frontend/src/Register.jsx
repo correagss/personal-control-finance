@@ -1,5 +1,5 @@
-// src/Register.jsx
-// src/Register.jsx
+
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
@@ -18,7 +18,8 @@ function Register() {
     setIsError(false);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/registrar`, {
+      
+      const response = await fetch('/api/registrar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -38,7 +39,7 @@ function Register() {
   };
 
   return (
-    // ... JSX continua igual
+    
     <div className="register-container">
       <div className="register-card">
         <h2>Create New Account</h2>

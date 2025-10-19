@@ -1,5 +1,5 @@
 
-// src/TransactionForm.jsx
+
 import React, { useState, useEffect } from 'react';
 import './TransactionForm.css';
 
@@ -24,11 +24,10 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
-
-    // --- CORRIGIDO ---
+    
     const url = isEditing
-      ? `${import.meta.env.VITE_API_URL}/api/transacoes/${transacaoParaEditar.id}` 
-      : `${import.meta.env.VITE_API_URL}/api/transacoes/`; 
+      ? `/api/transacoes/${transacaoParaEditar.id}` 
+      : `/api/transacoes/`;
 
     const method = isEditing ? 'PUT' : 'POST';
 
@@ -41,7 +40,6 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
         },
         body: JSON.stringify({ descricao, valor: parseFloat(valor), tipo })
       });
-
       if (!response.ok) {
         throw new Error(`Falha ao ${isEditing ? 'atualizar' : 'adicionar'} transação.`);
       }
@@ -56,14 +54,13 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
       } else {
         onTransactionAdded(); 
       }
-
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    // ... JSX continua igual
+    
     <div className="form-container">
       <h2>{isEditing ? 'Edit Transaction' : 'Add New Transaction'}</h2>
       <form onSubmit={handleSubmit} className="transaction-form">

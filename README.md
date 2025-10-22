@@ -107,5 +107,4 @@ Follow the steps below to set up and run the application in your development env
 
 **Gabriel Corrêa**
 
-*   **GitHub:** [@correagss](https://github.com/correagss)
 *   **LinkedIn:** www.linkedin.com/in/gabrielcorreasv

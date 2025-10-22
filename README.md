@@ -2,14 +2,16 @@
 
 A Full-Stack web application for personal finance management, allowing users to register, log in, and manage their income and expense transactions.
 
-**Access the live application:** [**https://[https://personal-finance-app-8tkn.onrender.com]**](https://[URL OF YOUR APP ON RENDER])
+**Access the live application:** [**https://[https://personal-finance-app-8tkn.onrender.com]**]
 
 ---
 
-![Login Screen of the App](https://via.placeholder.com/800x450.png/1e1e1e/00aaff?text=Screenshot+of+Login+Screen)
+![Login Screen of the App](<img width="1449" height="1088" alt="image" src="https://github.com/user-attachments/assets/5e1c30db-2edd-47cd-953a-c5d98ecbeade" />
+)
 *Login screen with a dark theme.*
 
-![Dashboard Screen](https://via.placeholder.com/800x450.png/1e1e1e/00aaff?text=Screenshot+of+Dashboard)
+![Dashboard Screen](<img width="1241" height="1235" alt="image" src="https://github.com/user-attachments/assets/e0200051-bad8-4aad-b74a-43f8b0af5d41" />
+)
 *Main dashboard showing the current balance, form, and transaction list.*
 
 ---

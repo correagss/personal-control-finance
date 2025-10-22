@@ -2,7 +2,7 @@
 
 A Full-Stack web application for personal finance management, allowing users to register, log in, and manage their income and expense transactions.
 
-**Access the live application:** [**https://personal-finance-app-8tkn.onrender.com**]
+**Access the live application:** **https://personal-finance-app-8tkn.onrender.com**
 
 ---
 

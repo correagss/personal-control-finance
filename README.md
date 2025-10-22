@@ -6,11 +6,11 @@ A Full-Stack web application for personal finance management, allowing users to 
 
 ---
 
-![Login Screen of the App] <img width="1449" height="1088" alt="image" src="https://github.com/user-attachments/assets/5e1c30db-2edd-47cd-953a-c5d98ecbeade" />
+<img width="1449" height="1088" alt="image" src="https://github.com/user-attachments/assets/5e1c30db-2edd-47cd-953a-c5d98ecbeade" />
 
 *Login screen with a dark theme.*
 
-![Dashboard Screen] <img width="1241" height="1235" alt="image" src="https://github.com/user-attachments/assets/e0200051-bad8-4aad-b74a-43f8b0af5d41" />
+<img width="1241" height="1235" alt="image" src="https://github.com/user-attachments/assets/e0200051-bad8-4aad-b74a-43f8b0af5d41" />
 *Main dashboard showing the current balance, form, and transaction list.*
 
 ---

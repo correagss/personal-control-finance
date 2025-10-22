@@ -1,4 +1,3 @@
-// src/Login.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Login.css';
@@ -14,7 +13,7 @@ function Login({ onLogin }) {
     setError('');
     try {
       
-      const response = await fetch('/api/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ 'username': email, 'password': password })

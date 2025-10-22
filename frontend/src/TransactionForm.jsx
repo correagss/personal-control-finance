@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import './TransactionForm.css';
 
@@ -25,9 +23,10 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
     event.preventDefault();
     setError('');
     
+    
     const url = isEditing
-      ? `/api/transacoes/${transacaoParaEditar.id}` 
-      : `/api/transacoes/`;
+      ? `${import.meta.env.VITE_API_URL}/transacoes/${transacaoParaEditar.id}` 
+      : `${import.meta.env.VITE_API_URL}/transacoes/`;
 
     const method = isEditing ? 'PUT' : 'POST';
 
@@ -55,12 +54,12 @@ function TransactionForm({ token, onTransactionAdded, transacaoParaEditar, onUpd
         onTransactionAdded(); 
       }
     } catch (err) {
+      
       setError(err.message);
     }
   };
 
   return (
-    
     <div className="form-container">
       <h2>{isEditing ? 'Edit Transaction' : 'Add New Transaction'}</h2>
       <form onSubmit={handleSubmit} className="transaction-form">

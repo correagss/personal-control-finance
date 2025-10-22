@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
@@ -19,7 +17,7 @@ function Register() {
 
     try {
       
-      const response = await fetch('/api/registrar', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/registrar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

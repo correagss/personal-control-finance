@@ -1,4 +1,3 @@
-// src/Dashboard.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './Dashboard.css';
 import TransactionForm from './TransactionForm';
@@ -13,8 +12,8 @@ function Dashboard({ token, onLogout }) {
     try {
       const [resSaldo, resTransacoes] = await Promise.all([
         
-        fetch('/api/saldo', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('/api/transacoes/', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${import.meta.env.VITE_API_URL}/saldo`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${import.meta.env.VITE_API_URL}/transacoes/`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       if (!resSaldo.ok || !resTransacoes.ok) { throw new Error('Failed to fetch data.'); }
       const dataSaldo = await resSaldo.json();
@@ -35,7 +34,7 @@ function Dashboard({ token, onLogout }) {
     if (!window.confirm('Are you sure you want to delete this transaction?')) return;
     try {
       
-      await fetch(`/api/transacoes/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/transacoes/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

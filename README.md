@@ -11,7 +11,7 @@ A Full-Stack web application for personal finance management, allowing users to 
 *Login screen with a dark theme.*
 
 <img width="1241" height="1235" alt="image" src="https://github.com/user-attachments/assets/e0200051-bad8-4aad-b74a-43f8b0af5d41" />
-*Main dashboard showing the current balance, form, and transaction list.*
+Main dashboard showing the current balance, form, and transaction list.
 
 ---
 
